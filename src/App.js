@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './style.css';
 import CytoscapeComponent from 'react-cytoscapejs';
 
 export default function App() {
   const [width, setWith] = useState('100%');
   const [height, setHeight] = useState('400px');
+  const myCyRef = useRef(null);
   const [graphData, setGraphData] = useState({
     nodes: [
       { data: { id: '1', label: 'IP 1', type: 'ip' } },
@@ -71,6 +72,12 @@ export default function App() {
 
   const styleSheet = [
     {
+      selector: '.hasLabel',
+      css: {
+        label: (ele) => ele.data('label')
+      },
+    },
+    {
       selector: 'node',
       style: {
         backgroundColor: '#4a56a6',
@@ -124,12 +131,15 @@ export default function App() {
     },
   ];
 
-  let myCyRef;
+  const toggleEdgeLabels = () => {
+    myCyRef.current._cy.elements().toggleClass('hasLabel')
+  };
 
   return (
     <>
       <div>
         <h1>Cytoscape example</h1>
+        <button onClick={toggleEdgeLabels}>Toggle edge labels</button>
         <div
           style={{
             border: '1px solid',
@@ -147,6 +157,7 @@ export default function App() {
             boxSelectionEnabled={true}
             layout={layout}
             stylesheet={styleSheet}
+            ref={myCyRef}
             cy={(cy) => {
               cy.on('tap', 'edge', (evt) => {
                 const edge = evt.target;
